@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First-Time Landlord Launch Kit — Diagnose · Analyze · Screen · Validate</title>
+<style>
+:root{
+  --bg:#0e1410; --card:#16201a; --card2:#1c2820; --line:#2a3a2f;
+  --txt:#eef4ee; --mut:#a9bdaa; --acc:#35c97e; --acc2:#e8b93c;
+  --good:#35c97e; --warn:#ffb224; --bad:#ff6b6b; --radius:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:radial-gradient(1200px 600px at 20% -10%,#1b2f22 0%,var(--bg) 55%) fixed,var(--bg);color:var(--txt);line-height:1.55}
+.wrap{max-width:940px;margin:0 auto;padding:28px 18px 80px}
+header.hero{background:linear-gradient(135deg,#152419,#0f1811);border:1px solid var(--line);border-radius:20px;padding:30px 28px;margin-bottom:22px}
+header.hero h1{margin:0 0 6px;font-size:30px;letter-spacing:-.5px}
+header.hero p{margin:0;color:var(--mut);max-width:660px}
+.badge{display:inline-block;background:linear-gradient(90deg,var(--acc),var(--acc2));color:#0c120d;font-size:12px;font-weight:800;
+  padding:4px 12px;border-radius:999px;margin-bottom:12px;letter-spacing:.4px}
+nav.tabs{display:flex;gap:8px;margin:0 0 20px;flex-wrap:wrap}
+nav.tabs button{flex:1;min-width:160px;background:var(--card);border:1px solid var(--line);color:var(--mut);
+  padding:12px 10px;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;transition:.15s}
+nav.tabs button.active{background:linear-gradient(135deg,var(--acc),#2aa865);color:#07120b;border-color:transparent}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin-bottom:18px}
+.card h2{margin:0 0 4px;font-size:22px}
+.card h3{margin:22px 0 8px;font-size:17px;color:#dfe9df}
+.sub{color:var(--mut);margin:0 0 14px;font-size:14px}
+label.q{display:block;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px;margin:10px 0;cursor:pointer}
+label.q .qt{font-weight:600;margin-bottom:10px;display:block}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opts label{display:flex;align-items:center;gap:6px;background:#101711;border:1px solid var(--line);border-radius:8px;
+  padding:8px 12px;font-size:13px;cursor:pointer;color:var(--mut)}
+.opts input{accent-color:var(--acc)}
+input[type=text],input[type=number],textarea,select{width:100%;background:#101711;border:1px solid var(--line);
+  color:var(--txt);border-radius:10px;padding:11px 12px;font-size:14px;margin:6px 0 12px;font-family:inherit}
+textarea{min-height:84px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px}
+@media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr}}
+.fld label{font-size:13px;color:var(--mut);font-weight:600}
+.btn{background:linear-gradient(135deg,var(--acc),#2aa865);color:#07120b;border:0;border-radius:10px;
+  padding:13px 22px;font-size:15px;font-weight:800;cursor:pointer;margin:8px 6px 0 0}
+.btn.ghost{background:#101711;border:1px solid var(--line);color:var(--txt)}
+.btn.small{padding:8px 14px;font-size:13px}
+.output{background:#0b100c;border:1px dashed var(--acc);border-radius:10px;padding:18px;margin-top:14px;font-size:15px}
+.output table{width:100%;border-collapse:collapse;font-size:14px}
+.output td{padding:6px 4px;border-bottom:1px solid var(--line)}
+.output td:last-child{text-align:right;font-weight:700}
+.scoreRing{width:170px;height:170px;border-radius:50%;margin:10px auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:44px;font-weight:800;border:10px solid var(--acc);background:#0b100c}
+.dim{margin:10px 0}
+.dim .bar{height:10px;background:#101711;border-radius:6px;overflow:hidden}
+.dim .fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.dim .lbl{display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px}
+.check{display:flex;gap:10px;align-items:flex-start;background:var(--card2);border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;margin:8px 0;cursor:pointer}
+.check input{margin-top:4px;accent-color:var(--good);transform:scale(1.25)}
+.check.done{opacity:.55;text-decoration:line-through}
+.prog{height:12px;background:#101711;border-radius:7px;overflow:hidden;margin:8px 0 4px}
+.prog>div{height:100%;background:linear-gradient(90deg,var(--good),var(--acc));width:0;transition:.3s}
+.deal{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px;margin:10px 0}
+.deal .del{float:right;background:none;border:0;color:var(--bad);cursor:pointer;font-size:16px}
+.verdict{font-size:18px;font-weight:800;padding:10px 14px;border-radius:10px;display:inline-block;margin:6px 0}
+.v-strong{background:rgba(53,201,126,.15);border:1px solid var(--good);color:var(--good)}
+.v-marg{background:rgba(255,178,36,.12);border:1px solid var(--warn);color:var(--warn)}
+.v-pass{background:rgba(255,107,107,.12);border:1px solid var(--bad);color:var(--bad)}
+.tag{display:inline-block;background:#223026;border:1px solid var(--line);color:var(--mut);font-size:12px;border-radius:999px;padding:3px 10px;margin:2px 4px 2px 0}
+.fine{font-size:12px;color:var(--mut);background:#101711;border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:14px}
+.tabpane{display:none}.tabpane.active{display:block}
+ul.why{margin:8px 0;padding-left:20px;color:var(--mut);font-size:14px}
+ul.why li{margin:4px 0}
+@media print{nav.tabs,.btn,.no-print{display:none}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <span class="badge">FIRST-TIME LANDLORD LAUNCH KIT</span>
+  <h1>Buy your first rental without the rookie mistakes.</h1>
+  <p>Diagnose your readiness, run the real numbers on any deal, score tenants like a pro, and validate every step — all in one place, all offline. Your answers never leave this browser.</p>
+</header>
+<nav class="tabs">
+  <button class="active" data-tab="quiz">1 · Readiness Quiz</button>
+  <button data-tab="deal">2 · Deal Analyzer</button>
+  <button data-tab="screen">3 · Tenant Scorecard</button>
+  <button data-tab="validate">4 · Checklists</button>
+</nav>
+
+<!-- ============ TAB 1: DIAGNOSTIC ============ -->
+<section class="tabpane active" id="tab-quiz">
+<div class="card">
+  <h2>Diagnostic — Rental Readiness Quiz</h2>
+  <p class="sub">10 questions across 4 dimensions. Answer honestly; the kit tells you your #1 focus area before you spend a dollar.</p>
+  <div id="quizQs"></div>
+  <button class="btn" onclick="scoreQuiz()">Score my readiness</button>
+  <button class="btn ghost" onclick="resetQuiz()">Reset</button>
+  <div id="quizOut"></div>
+</div>
+</section>
+
+<!-- ============ TAB 2: GENERATOR A ============ -->
+<section class="tabpane" id="tab-deal">
+<div class="card">
+  <h2>Generator — Rental Deal Analyzer</h2>
+  <p class="sub">Enter a real listing's numbers. The analyzer computes mortgage, cash flow, cap rate, cash-on-cash, DSCR, and gives a deal verdict. Save deals to compare.</p>
+  <div class="grid3">
+    <div class="fld"><label>Purchase price ($)</label><input type="number" id="d_price" value="250000"></div>
+    <div class="fld"><label>Monthly rent ($)</label><input type="number" id="d_rent" value="2000"></div>
+    <div class="fld"><label>Property tax ($/yr)</label><input type="number" id="d_tax" value="3000"></div>
+    <div class="fld"><label>Insurance ($/yr)</label><input type="number" id="d_ins" value="1500"></div>
+    <div class="fld"><label>HOA ($/mo)</label><input type="number" id="d_hoa" value="0"></div>
+    <div class="fld"><label>Down payment (%)</label><input type="number" id="d_down" value="20"></div>
+    <div class="fld"><label>Interest rate (%/yr)</label><input type="number" step="0.125" id="d_rate" value="7"></div>
+    <div class="fld"><label>Loan term (yrs)</label><input type="number" id="d_term" value="30"></div>
+    <div class="fld"><label>Vacancy (%)</label><input type="number" step="0.5" id="d_vac" value="5"></div>
+    <div class="fld"><label>Maintenance (% of rent)</label><input type="number" step="0.5" id="d_maint" value="5"></div>
+    <div class="fld"><label>CapEx reserve (% of rent)</label><input type="number" step="0.5" id="d_capex" value="5"></div>
+    <div class="fld"><label>Management (% of rent)</label><input type="number" step="0.5" id="d_mgmt" value="8"></div>
+  </div>
+  <div class="fld"><label>Deal nickname (for saved list)</label><input type="text" id="d_name" placeholder="e.g. 3/2 on Maple St"></div>
+  <button class="btn" onclick="analyzeDeal()">Analyze this deal</button>
+  <button class="btn ghost" onclick="saveDeal()">Save deal</button>
+  <div id="dealOut"></div>
+  <h3>Saved deals</h3>
+  <div id="dealList"><p class="sub">No saved deals yet.</p></div>
+</div>
+</section>
+
+<!-- ============ TAB 3: GENERATOR B ============ -->
+<section class="tabpane" id="tab-screen">
+<div class="card">
+  <h2>Generator — Tenant Screening Scorecard</h2>
+  <p class="sub">Score every applicant on the same five financial/operational factors (100 pts). Consistent criteria = better tenants and fair-housing-safe decisions.</p>
+  <div class="grid2">
+    <div class="fld"><label>Monthly rent for this unit ($)</label><input type="number" id="s_rent" value="2000"></div>
+    <div class="fld"><label>Applicant gross monthly income ($)</label><input type="number" id="s_income" value="6500"></div>
+    <div class="fld"><label>Credit tier</label><select id="s_credit">
+      <option value="25">750+ (excellent)</option><option value="19">700–749 (good)</option>
+      <option value="12">650–699 (fair)</option><option value="6">600–649 (weak)</option>
+      <option value="0">Below 600 / no score</option></select></div>
+    <div class="fld"><label>Rental history</label><select id="s_renthist">
+      <option value="20">On-time 2+ years, great reference</option><option value="14">On-time 1–2 years</option>
+      <option value="8">Short / thin history</option><option value="0">Late payments or broken lease</option></select></div>
+    <div class="fld"><label>Employment stability</label><select id="s_emp">
+      <option value="15">2+ years same employer/field</option><option value="10">1–2 years steady</option>
+      <option value="5">Gig / freelance / &lt;1 yr</option><option value="0">Unemployed, no income proof</option></select></div>
+    <div class="fld"><label>Eviction / judgment history</label><select id="s_evict">
+      <option value="10">None</option><option value="5">Over 5 years ago</option>
+      <option value="0">Within last 5 years</option></select></div>
+  </div>
+  <button class="btn" onclick="scoreApplicant()">Score applicant</button>
+  <div id="screenOut"></div>
+  <div class="fine"><strong>Fair housing note:</strong> Score financial and operational factors only — never race, color, religion, sex, disability, familial status, or national origin. Apply the identical criteria to every applicant and document each decision. This tool is educational, not legal advice; check your state's screening laws.</div>
+</div>
+</section>
+
+<!-- ============ TAB 4: VALIDATOR ============ -->
+<section class="tabpane" id="tab-validate">
+<div class="card">
+  <h2>Validator — Pre-Offer Due Diligence</h2>
+  <p class="sub">Run this before you offer. <span id="preCount">0/12</span> complete.</p>
+  <div class="prog"><div id="preBar"></div></div>
+  <div id="preList"></div>
+  <button class="btn small ghost no-print" onclick="resetChecks('pre')">Reset list</button>
+</div>
+<div class="card">
+  <h2>Validator — Tenant Placement &amp; Move-In</h2>
+  <p class="sub">Run this before you hand over keys. <span id="moveCount">0/12</span> complete.</p>
+  <div class="prog"><div id="moveBar"></div></div>
+  <div id="moveList"></div>
+  <button class="btn small ghost no-print" onclick="resetChecks('move')">Reset list</button>
+  <button class="btn small no-print" onclick="window.print()">Print checklists</button>
+</div>
+</section>
+
+<footer class="no-print" style="text-align:center;color:var(--mut);font-size:13px;margin-top:30px">
+  First-Time Landlord Launch Kit · Educational tool, not legal, tax, or financial advice. Verify numbers with your lender, insurer, and local laws.
+</footer>
+</div>
+
+<script>
+/* ---------- Tabs ---------- */
+document.querySelectorAll('nav.tabs button').forEach(b=>{
+  b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');document.getElementById('tab-'+b.dataset.tab).classList.add('active');};
+});
+const $=id=>document.getElementById(id);
+const fmt=n=>'$'+Math.round(n).toLocaleString('en-US');
+const fmt1=n=>(Math.round(n*10)/10).toLocaleString('en-US');
+
+/* ---------- Quiz ---------- */
+const QUIZ=[
+ {q:"How much cash could you put toward a down payment + closing costs today?",d:"Money",o:["Under 5% of my target price","5–15%","15–25%","25% or more"]},
+ {q:"If the property sat vacant for 3 months, you would…",d:"Money",o:["Panic — I couldn't cover it","Scramble to cover it","Cover it, uncomfortably","Cover 6+ months from reserves, no sweat"]},
+ {q:"How well do you know rents in your target neighborhood?",d:"Market",o:["No idea","Rough guess","Checked a few listings","Tracked comps for weeks"]},
+ {q:"Have you ever run the numbers (cash flow, cap rate) on a real listing?",d:"Market",o:["Never","Once","A few times","Regularly"]},
+ {q:"A tenant stops paying in month 2. Your first move is…",d:"Risk",o:["Panic","I'm not sure","Follow my written process","Execute my plan — I budgeted for this"]},
+ {q:"How do you feel about carrying debt on an investment property?",d:"Risk",o:["Terrified","Uneasy","Comfortable — I've done the math","Strategic — it's a tool"]},
+ {q:"Who fixes a burst pipe at 2 AM?",d:"Ops",o:["I'd panic","I'd call around frantically","My handyman","My vendor list + process handles it"]},
+ {q:"How will you screen tenants?",d:"Ops",o:["Gut feeling","A basic application","Written criteria + credit/background checks","Full system + I know fair housing rules"]},
+ {q:"How much time per week can you realistically give this?",d:"Ops",o:["Under 1 hour","1–3 hours","3–5 hours","5+ hours"]},
+ {q:"Have you read your state's landlord–tenant basics (deposits, notices, eviction)?",d:"Ops",o:["No","Skimmed something once","Read a summary","I know them"]}
+];
+const DIMS=["Money","Market","Risk","Ops"];
+const DIMTIP={Money:"Build your down payment + a 6-month reserve before you shop.",
+ Market:"Track 20 listings and run their numbers in the Deal Analyzer before you offer.",
+ Risk:"Write your vacancy and non-payment plan now — decide while you're calm.",
+ Ops:"Line up screening criteria, a lease, and one reliable handyman before you buy."};
+function buildQuiz(){
+  $('quizQs').innerHTML=QUIZ.map((it,i)=>
+   `<label class="q"><span class="qt">${i+1}. ${it.q} <span class="tag">${it.d}</span></span><span class="opts">`+
+   it.o.map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${o}</label>`).join('')+`</span></label>`).join('');
+}
+function scoreQuiz(){
+  let dims={Money:[],Market:[],Risk:[],Ops:[]},unanswered=[];
+  QUIZ.forEach((it,i)=>{const s=document.querySelector(`input[name=q${i}]:checked`);
+    if(!s)unanswered.push(i+1);else dims[it.d].push(+s.value);});
+  if(unanswered.length){$('quizOut').innerHTML=`<div class="output">Please answer question(s): ${unanswered.join(', ')}.</div>`;return;}
+  const pct=a=>Math.round(a.reduce((x,y)=>x+y,0)/(a.length*3)*100);
+  const scores={};DIMS.forEach(d=>scores[d]=pct(dims[d]));
+  const total=Math.round(DIMS.reduce((s,d)=>s+scores[d],0)/4);
+  const weak=DIMS.reduce((a,b)=>scores[a]<scores[b]?a:b);
+  const verdict=total>=75?["Ready to hunt","v-strong","Your foundation is solid. Start analyzing real deals — the Deal Analyzer tab is your next stop."]
+    :total>=50?["Almost there","v-marg","Don't buy yet. Fix your weakest area first, then re-take the quiz."]
+    :["Learn first, buy later","v-pass","Buying now is how rookie mistakes happen. Work the focus area below for 30 days, then re-take."];
+  $('quizOut').innerHTML=`<div class="output">
+    <div style="text-align:center"><div class="scoreRing">${total}<span style="font-size:14px;font-weight:600">/ 100</span></div>
+    <div class="verdict ${verdict[1]}">${verdict[0]}</div>
+    <p class="sub" style="max-width:560px;margin:8px auto">${verdict[2]}</p></div>
+    ${DIMS.map(d=>`<div class="dim"><div class="lbl"><span>${d}${d===weak?' ⭐ focus area':''}</span><span>${scores[d]}/100</span></div><div class="bar"><div class="fill" style="width:${scores[d]}%"></div></div></div>`).join('')}
+    <p><strong>Your #1 focus area: ${weak}.</strong> ${DIMTIP[weak]}</p></div>`;
+  try{localStorage.setItem('llk_quiz',JSON.stringify({scores,total,ts:Date.now()}));}catch(e){}
+}
+function resetQuiz(){buildQuiz();$('quizOut').innerHTML='';}
+buildQuiz();
+</script>
+
+<script>
+/* ---------- Deal Analyzer ---------- */
+function num(id){const v=parseFloat($(id).value);return isNaN(v)?0:v;}
+function pmt(loan,rate,termYrs){
+  const r=rate/100/12,n=termYrs*12;
+  if(r<=0)return loan/n;
+  return loan*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+}
+function analyzeDeal(){
+  const price=num('d_price'),rent=num('d_rent'),tax=num('d_tax'),ins=num('d_ins'),
+        hoa=num('d_hoa'),downP=num('d_down'),rate=num('d_rate'),term=num('d_term'),
+        vac=num('d_vac'),maint=num('d_maint'),capex=num('d_capex'),mgmt=num('d_mgmt');
+  if(price<=0||rent<=0){$('dealOut').innerHTML='<div class="output">Enter a purchase price and monthly rent to analyze.</div>';return;}
+  const down=price*downP/100, loan=price-down, closing=price*0.03, cashIn=down+closing;
+  const pi=pmt(loan,rate,term);
+  const grossAnnual=rent*12, vacLoss=grossAnnual*vac/100, egi=grossAnnual-vacLoss;
+  const opexAnnual=tax+ins+hoa*12+grossAnnual*(maint+capex+mgmt)/100;
+  const noi=egi-opexAnnual, debtAnnual=pi*12;
+  const cfAnnual=noi-debtAnnual, cfMonthly=cfAnnual/12;
+  const capRate=noi/price*100, coc=cashIn>0?cfAnnual/cashIn*100:0;
+  const onePct=rent/price*100, dscr=debtAnnual>0?noi/debtAnnual:99;
+  const opexRatio=egi>0?opexAnnual/egi*100:0;
+  let cls,verdict,why=[];
+  if(cfMonthly>0&&coc>=8&&dscr>=1.2){cls='v-strong';verdict='STRONG DEAL — worth a deeper look';}
+  else if(cfMonthly>0){cls='v-marg';verdict='MARGINAL — cash flows, but thin';}
+  else{cls='v-pass';verdict='PASS — the math does not work';}
+  why.push(`Monthly cash flow ${cfMonthly>=0?'+':''}${fmt(cfMonthly)} ${cfMonthly>0?'(positive — the #1 requirement)':'(negative — you would feed this property every month)'}.`);
+  why.push(`Cash-on-cash ${fmt1(coc)}% on ~${fmt(cashIn)} invested ${coc>=8?'(meets the 8%+ target)':'(below the 8%+ target — your cash works harder elsewhere)'}.`);
+  why.push(`Cap rate ${fmt1(capRate)}% ${capRate>=6?'(healthy for most markets)':'(soft — price is high relative to income)'}.`);
+  why.push(`1% rule: ${fmt1(onePct)}% ${onePct>=1?'(meets it — rare in 2026)':'(misses the 1% benchmark, normal today — trust cash flow instead)'}.`);
+  why.push(`DSCR ${fmt1(dscr)} ${dscr>=1.2?'(lenders like 1.2+)':'(under 1.2 — refinancing or lender trouble risk)'}.`);
+  why.push(`Operating expenses are ${fmt1(opexRatio)}% of effective income ${opexRatio<=50?'(passes the 50% rule sanity check)':'(above 50% — expenses are eating the deal)'}.`);
+  window._lastDeal={name:$('d_name').value||('Deal '+new Date().toLocaleDateString()),price,rent,cfMonthly:Math.round(cfMonthly),coc:Math.round(coc*10)/10,capRate:Math.round(capRate*10)/10,verdict,ts:Date.now()};
+  $('dealOut').innerHTML=`<div class="output">
+    <div class="verdict ${cls}">${verdict}</div>
+    <table>
+    <tr><td>Cash invested (down + ~3% closing)</td><td>${fmt(cashIn)}</td></tr>
+    <tr><td>Monthly mortgage (P&amp;I)</td><td>${fmt(pi)}</td></tr>
+    <tr><td>Monthly PITI + HOA</td><td>${fmt(pi+(tax+ins)/12+hoa)}</td></tr>
+    <tr><td>Effective gross income (after ${fmt1(vac)}% vacancy)</td><td>${fmt(egi)}/yr</td></tr>
+    <tr><td>Operating expenses (excl. mortgage)</td><td>${fmt(opexAnnual)}/yr</td></tr>
+    <tr><td>Net operating income (NOI)</td><td>${fmt(noi)}/yr</td></tr>
+    <tr><td><strong>Cash flow</strong></td><td><strong>${cfMonthly>=0?'+':''}${fmt(cfMonthly)}/mo · ${cfAnnual>=0?'+':''}${fmt(cfAnnual)}/yr</strong></td></tr>
+    <tr><td>Cap rate</td><td>${fmt1(capRate)}%</td></tr>
+    <tr><td>Cash-on-cash return</td><td>${fmt1(coc)}%</td></tr>
+    <tr><td>DSCR</td><td>${fmt1(dscr)}</td></tr>
+    </table>
+    <ul class="why">${why.map(w=>`<li>${w}</li>`).join('')}</ul>
+    <p class="sub">Estimates only — verify taxes, insurance, and HOA with real quotes before offering.</p></div>`;
+}
+function getDeals(){try{return JSON.parse(localStorage.getItem('llk_deals')||'[]');}catch(e){return[];}}
+function renderDeals(){
+  const ds=getDeals();
+  $('dealList').innerHTML=ds.length?ds.map((d,i)=>
+   `<div class="deal"><button class="del" onclick="delDeal(${i})">×</button><strong>${d.name}</strong>
+    <br><span class="tag">${fmt(d.price)} · ${fmt(d.rent)}/mo</span>
+    <span class="tag">Cash flow ${d.cfMonthly>=0?'+':''}${fmt(d.cfMonthly)}/mo</span>
+    <span class="tag">CoC ${fmt1(d.coc)}%</span><span class="tag">Cap ${fmt1(d.capRate)}%</span>
+    <br><span class="sub">${d.verdict}</span></div>`).join('')
+   :'<p class="sub">No saved deals yet.</p>';
+}
+function saveDeal(){
+  if(!window._lastDeal){$('dealOut').innerHTML='<div class="output">Analyze a deal first, then save it.</div>';return;}
+  const ds=getDeals();ds.unshift(window._lastDeal);
+  try{localStorage.setItem('llk_deals',JSON.stringify(ds.slice(0,20)));}catch(e){}
+  renderDeals();
+}
+function delDeal(i){const ds=getDeals();ds.splice(i,1);
+  try{localStorage.setItem('llk_deals',JSON.stringify(ds));}catch(e){}renderDeals();}
+renderDeals();
+
+/* ---------- Screening Scorecard ---------- */
+function scoreApplicant(){
+  const rent=num('s_rent'),income=num('s_income');
+  if(rent<=0||income<=0){$('screenOut').innerHTML='<div class="output">Enter rent and applicant income.</div>';return;}
+  const ratio=income/rent;
+  const incPts=ratio>=3?30:ratio>=2.5?20:ratio>=2?10:0;
+  const pts=incPts+num('s_credit')+num('s_renthist')+num('s_emp')+num('s_evict');
+  let cls,label,note;
+  if(pts>=80){cls='v-strong';label='APPROVE';note='Strong applicant. Proceed with lease, deposit, and move-in inspection.';}
+  else if(pts>=60){cls='v-marg';label='CONDITIONAL';note='Workable with protection: require a larger deposit (where legal), a qualified co-signer, or shorter initial lease.';}
+  else{cls='v-pass';label='DECLINE';note='Does not meet your written criteria. Decline politely, in writing, with the same process you use for everyone.';}
+  $('screenOut').innerHTML=`<div class="output">
+    <div style="text-align:center"><div class="scoreRing">${pts}<span style="font-size:14px;font-weight:600">/ 100</span></div>
+    <div class="verdict ${cls}">${label}</div><p class="sub" style="max-width:560px;margin:8px auto">${note}</p></div>
+    <table>
+    <tr><td>Income (${fmt(income)}/mo = ${fmt1(ratio)}× rent)</td><td>${incPts}/30</td></tr>
+    <tr><td>Credit tier</td><td>${$('s_credit').value}/25</td></tr>
+    <tr><td>Rental history</td><td>${$('s_renthist').value}/20</td></tr>
+    <tr><td>Employment stability</td><td>${$('s_emp').value}/15</td></tr>
+    <tr><td>Eviction history</td><td>${$('s_evict').value}/10</td></tr>
+    </table>
+    <p class="sub">Remember: a vacant unit is cheaper than the wrong tenant. Never lower standards from desperation.</p></div>`;
+}
+
+/* ---------- Checklists ---------- */
+const CHECKS={
+ pre:["Pulled the ACTUAL property tax bill (not the listing's estimate)",
+  "Got a real landlord insurance quote for this property",
+  "Verified market rent with 3+ comparable listings",
+  "Re-ran the numbers at +1% interest (stress test)",
+  "Checked flood zone, crime stats, and school ratings",
+  "Estimated big capex: roof, HVAC, water heater, plumbing age",
+  "Confirmed HOA allows rentals (and exact fees/rules)",
+  "Walked the property in person (photos aren't enough)",
+  "Checked title for liens and back taxes",
+  "Know your exit: resale comps if the rental math fails",
+  "Investment-property pre-approval letter in hand",
+  "Reserves confirmed: 6 months PITI + $5k repair buffer"],
+ move:["Written screening criteria set BEFORE the first application",
+  "Application collects income proof, ID, rental history, check consent",
+  "Income verified at 3× rent (pay stubs / bank statements)",
+  "Credit + background + eviction check on every adult applicant",
+  "Previous landlord references actually called",
+  "Identical process for every applicant (fair housing consistency)",
+  "Lease signed + all state-required disclosures delivered",
+  "Full security deposit collected before keys (within state limits)",
+  "Move-in inspection: dated photos of every room + signed condition report",
+  "Utilities confirmed transferred to tenant's name",
+  "Rent method, due date, and late-fee policy explained in writing",
+  "First rent + deposit funds cleared before move-in day"]
+};
+function getChecks(k){try{return JSON.parse(localStorage.getItem('llk_'+k)||'[]');}catch(e){return[];}}
+function renderChecks(k){
+  const done=getChecks(k),list=CHECKS[k];
+  const el=k==='pre'?$('preList'):$('moveList');
+  el.innerHTML=list.map((t,i)=>`<label class="check${done.includes(i)?' done':''}"><input type="checkbox" ${done.includes(i)?'checked':''} onchange="toggleCheck('${k}',${i})"><span>${t}</span></label>`).join('');
+  const n=done.length;
+  if(k==='pre'){$('preCount').textContent=n+'/'+list.length;$('preBar').style.width=(n/list.length*100)+'%';}
+  else{$('moveCount').textContent=n+'/'+list.length;$('moveBar').style.width=(n/list.length*100)+'%';}
+}
+function toggleCheck(k,i){
+  let done=getChecks(k);
+  done=done.includes(i)?done.filter(x=>x!==i):done.concat(i);
+  try{localStorage.setItem('llk_'+k,JSON.stringify(done));}catch(e){}
+  renderChecks(k);
+}
+function resetChecks(k){try{localStorage.removeItem('llk_'+k);}catch(e){}renderChecks(k);}
+renderChecks('pre');renderChecks('move');
+</script>
+</body>
+</html>
